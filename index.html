@@ -5,25 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sorteio + Simulador de Campeonato</title>
   <style>
- body {
+body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background: url("fotokrieger.jpg") no-repeat center center fixed;
   background-size: cover;
-  color: #fff; /* deixa o texto branco para contrastar */
-    .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 20px; margin-top: 20px; }
-    .time { background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); padding: 15px; }
-    .jogador { padding: 6px; margin: 3px 0; border-radius: 6px; color: #fff; font-size: 13px; }
-    .pote-0{background:#e74c3c}.pote-1{background:#3498db}.pote-2{background:#f1c40f;color:#000}.pote-3{background:#2ecc71}.pote-4{background:#9b59b6}.pote-5{background:#e67e22}.pote-6{background:#1abc9c}
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-    th { background: #eee; }
-    .jogo { margin: 10px 0; padding: 10px; background: #fff; border-radius: 5px; }
-    .inputs { display: flex; justify-content: center; gap: 10px; margin-top: 5px; }
-    input { width: 40px; text-align: center; }
-    .fase { margin-top: 30px; }
-  </style>
+  color: #fff;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+  font-size: 28px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 20px 0;
+  border: none;
+  border-radius: 8px;
+  background: #28a745;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #218838;
+}
+
+/* GRID RESPONSIVO */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  padding: 0 10px;
+}
+
+.time {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 15px;
+}
+
+.time h3 {
+  margin: 0 0 10px;
+  color: #333;
+}
+
+.jogador {
+  padding: 6px;
+  margin: 4px 0;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* CORES DOS JOGADORES */
+.pote-0 { background:#e74c3c; }
+.pote-1 { background:#3498db; }
+.pote-2 { background:#f1c40f; color:#000; }
+.pote-3 { background:#2ecc71; }
+.pote-4 { background:#9b59b6; }
+.pote-5 { background:#e67e22; }
+.pote-6 { background:#1abc9c; }
+
+/* ÁREA DE FASES */
+.fase {
+  margin-top: 40px;
+  padding: 0 10px;
+}
+
+.jogo {
+  margin: 10px auto;
+  padding: 10px;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+input {
+  width: 50px;
+  padding: 4px;
+  text-align: center;
+}
+
+/* TABELA CLASSIFICAÇÃO */
+table {
+  width: 100%;
+  max-width: 700px;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+}
+
+th {
+  background: #eee;
+  color: #333;
+}
+
 </head>
 <body>
   <h1>Sorteio + Simulador de Campeonato</h1>
@@ -223,4 +323,5 @@
   </script>
 </body>
 </html>
+
 
