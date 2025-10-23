@@ -123,192 +123,203 @@
   <div class="fase" id="mata-mata"></div>
 
   <script>
-    // Jogadores fixos
-    const potes = [
-      ["Martin", "Pepê", "Rodi", "Bebeto", "Echer", "Ph", "Joca"], 
-      ["Bezinho", "Toninho", "Trindade", "Conceição", "Gabi", "Murilo", "Borba"],
-      ["Fred", "Toledo", "Rey", "Bruno", "Pastl", "Guarda", "Jonas"],
-      ["Lunardi", "Dudu", "Fuentes", "Lubi", "Guiga", "Machaus", "Ph Laba"],
-      ["Schi", "Rossato", "Krieger", "Pitt", "Cebola", "Terra", "Pedrinho"],
-      ["Rigo", "Perneta", "Krupp", "Guto", "Meira", "Moller", "Cauã"],
-      ["Jordan", "Sucasas", "Davi", "Fred TC", "Igna", "Igor", "Cacique"]
-    ];
-    let times = [], tabela = [];
-    let resultados = {}; // placares guardados
+  const potes = [
+    ["Martin", "Pepê", "Rodi", "Bebeto", "Borba", "Ph", "Joca"], 
+    ["Bezinho", "Toninho", "Trindade", "Conceição", "Gabi", "Murilo", "Toledo"],
+    ["Fred", "Guiga", "Rey", "Bruno", "Lubi", "Guarda", "Jonas"],
+    ["Lunardi", "Dudu", "Fuentes", "Rossato", "Vitt", "Machaus", "Ph Laba"],
+    ["Schi", "Krupp", "Krieger", "Pitt", "Cebola", "Terra", "Pedrinho"],
+    ["Rigo", "Perneta", "Vargas", "Guto", "Meira", "Moller", "Cauã"],
+    ["Jordan", "Sucasas", "Davi", "Fred TC", "Igna", "Igor", "Cacique"]
+  ];
 
-    // Rodadas fixas
-    const rodadas = [
-      [[1,6],[2,5],[3,4],[0,null]], // Rodada 1 (folga T1 -> index 0)
-      [[0,6],[1,4],[2,3],[5,null]],
-      [[0,5],[6,4],[1,2],[3,null]],
-      [[0,4],[5,3],[6,2],[1,null]],
-      [[0,3],[4,2],[5,1],[6,null]],
-      [[0,2],[3,1],[5,6],[4,null]],
-      [[0,1],[3,6],[4,5],[2,null]],
-    ];
+  let times = [], tabela = [], resultados = {};
 
-    function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+  const rodadas = [
+    [[1,6],[2,5],[3,4],[0,null]], 
+    [[0,6],[1,4],[2,3],[5,null]],
+    [[0,5],[6,4],[1,2],[3,null]],
+    [[0,4],[5,3],[6,2],[1,null]],
+    [[0,3],[4,2],[5,1],[6,null]],
+    [[0,2],[3,1],[5,6],[4,null]],
+    [[0,1],[3,6],[4,5],[2,null]],
+  ];
 
-    function sortearTimes(){
-      const potesEmbaralhados = potes.map(p=>shuffle([...p]));
-      times = [[],[],[],[],[],[],[]];
-      for(let i=0;i<7;i++){
-        for(let j=0;j<7;j++){
-          times[j].push({nome:potesEmbaralhados[i][j],pote:i});
-        }
-      }
-      renderTimes();
-      gerarFaseGrupos();
-    }
+  function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
-    function renderTimes(){
-      const div=document.getElementById("times"); div.innerHTML="";
-      times.forEach((time,i)=>{
-        let html=`<div class="time"><h3>Time ${i+1}</h3>`;
-        html+=time.map(j=>`<div class="jogador pote-${j.pote}">${j.nome}</div>`).join('');
-        html+="</div>"; div.innerHTML+=html;
-      });
-    }
-
-    function gerarFaseGrupos(){
-      resultados={};
-      tabela = times.map((_,i)=>({id:i,pontos:0,j:0,v:0,e:0,d:0,gp:0,gc:0,sg:0}));
-      renderRodadas();
-      atualizarClassificacao();
-    }
-
-    function renderRodadas(){
-      const div=document.getElementById("fase-grupos");
-      div.innerHTML="<h2>Fase de Grupos</h2>";
-      rodadas.forEach((jogos,ri)=>{
-        div.innerHTML+=`<h3>Rodada ${ri+1}</h3>`;
-        jogos.forEach((j,ji)=>{
-          if(j[1]!==null){
-            div.innerHTML+=`
-              <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
-                <div class="inputs">
-                  <input type="number" min="0" id="r${ri}a${ji}" onchange="registrarPlacar(${ri},${ji},${j[0]},${j[1]})"> - 
-                  <input type="number" min="0" id="r${ri}b${ji}" onchange="registrarPlacar(${ri},${ji},${j[0]},${j[1]})">
-                </div>
-              </div>`;
-          } else {
-            div.innerHTML+=`<div class="jogo"><em>Time ${j[0]+1} folga</em></div>`;
-          }
-        });
-      });
-    }
-
-    function registrarPlacar(ri,ji,a,b){
-      const ga=document.getElementById(`r${ri}a${ji}`).value;
-      const gb=document.getElementById(`r${ri}b${ji}`).value;
-      resultados[`${ri}-${ji}`]={a:a,b:b,ga:ga!==""?parseInt(ga):null,gb:gb!==""?parseInt(gb):null};
-      atualizarClassificacao();
-    }
-
-    function atualizarClassificacao(){
-      tabela.forEach(t=>{t.pontos=0;t.j=0;t.v=0;t.e=0;t.d=0;t.gp=0;t.gc=0;t.sg=0;});
-      Object.values(resultados).forEach(r=>{
-        if(r.ga!=null && r.gb!=null){
-          const ta=tabela[r.a], tb=tabela[r.b];
-          ta.j++; tb.j++;
-          ta.gp+=r.ga; ta.gc+=r.gb;
-          tb.gp+=r.gb; tb.gc+=r.ga;
-          if(r.ga>r.gb){ ta.v++; tb.d++; ta.pontos+=3; }
-          else if(r.gb>r.ga){ tb.v++; ta.d++; tb.pontos+=3; }
-          else { ta.e++; tb.e++; ta.pontos++; tb.pontos++; }
-        }
-      });
-      tabela.forEach(t=>t.sg=t.gp-t.gc);
-      tabela.sort((a,b)=>b.pontos-a.pontos || b.v-a.v || b.sg-a.sg || b.gp-a.gp);
-      renderClassificacao();
-    }
-
-    function renderClassificacao(){
-      let html="<h2>Classificação</h2><table><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr>";
-      tabela.forEach((t,i)=>{
-        html+=`<tr><td>${i+1}</td><td>Time ${t.id+1}</td><td>${t.pontos}</td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp}</td><td>${t.gc}</td><td>${t.sg}</td></tr>`;
-      });
-      html+="</table>";
-      document.getElementById("classificacao").innerHTML=html;
-      if(Object.values(resultados).length===21 && Object.values(resultados).every(r=>r.ga!=null&&r.gb!=null)){
-        gerarMataMata();
+  function sortearTimes(){
+    const potesEmbaralhados = potes.map(p=>shuffle([...p]));
+    times = [[],[],[],[],[],[],[]];
+    for(let i=0;i<7;i++){
+      for(let j=0;j<7;j++){
+        times[j].push({nome:potesEmbaralhados[i][j],pote:i});
       }
     }
+    renderTimes();
+    gerarFaseGrupos();
+    document.getElementById("mata-mata").innerHTML = "";
+  }
 
-    // --- Mata-Mata igual antes ---
-    function gerarMataMata(){
-      const div=document.getElementById("mata-mata");
-      div.innerHTML="<h2>Mata-Mata</h2>";
-      const classificados=tabela.slice(0,6);
-      const semi1Direto=classificados[0].id;
-      const semi2Direto=classificados[1].id;
-      const quartas=[[classificados[2].id,classificados[5].id],[classificados[3].id,classificados[4].id]];
-      div.innerHTML+="<h3>Quartas de Final</h3>";
-      quartas.forEach((j,i)=>{
-        div.innerHTML+=`
-          <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
-            <div class="inputs">
-              <input type="number" min="0" id="qa${i}" onchange="resultadoQuartas(${i},${j[0]},${j[1]})"> - 
-              <input type="number" min="0" id="qb${i}" onchange="resultadoQuartas(${i},${j[0]},${j[1]})">
-            </div>
-          </div>`;
+  function renderTimes(){
+    const div=document.getElementById("times"); div.innerHTML="";
+    times.forEach((time,i)=>{
+      let html=`<div class="time"><h3>Time ${i+1}</h3>`;
+      html+=time.map(j=>`<div class="jogador pote-${j.pote}">${j.nome}</div>`).join('');
+      html+="</div>"; div.innerHTML+=html;
+    });
+  }
+
+  function gerarFaseGrupos(){
+    resultados={};
+    tabela = times.map((_,i)=>({id:i,pontos:0,j:0,v:0,e:0,d:0,gp:0,gc:0,sg:0}));
+    renderRodadas();
+    atualizarClassificacao();
+  }
+
+  function renderRodadas(){
+    const div=document.getElementById("fase-grupos");
+    div.innerHTML="<h2>Fase de Grupos</h2>";
+    rodadas.forEach((jogos,ri)=>{
+      div.innerHTML+=`<h3>Rodada ${ri+1}</h3>`;
+      jogos.forEach((j,ji)=>{
+        if(j[1]!==null){
+          div.innerHTML+=`
+            <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
+              <div class="inputs">
+                <input type="number" min="0" id="r${ri}a${ji}" onchange="registrarPlacar(${ri},${ji},${j[0]},${j[1]})"> - 
+                <input type="number" min="0" id="r${ri}b${ji}" onchange="registrarPlacar(${ri},${ji},${j[0]},${j[1]})">
+              </div>
+            </div>`;
+        } else {
+          div.innerHTML+=`<div class="jogo"><em>Time ${j[0]+1} folga</em></div>`;
+        }
       });
-      window.quartasRes={};
-      window.semiDireto=[semi1Direto,semi2Direto];
-    }
+    });
+  }
 
-    function resultadoQuartas(i,a,b){
-      const ga=parseInt(document.getElementById("qa"+i).value)||0;
-      const gb=parseInt(document.getElementById("qb"+i).value)||0;
-      window.quartasRes[i]=(ga>gb?a:gb>ga?b:null);
-      if(Object.keys(window.quartasRes).length===2) gerarSemis();
-    }
+  function registrarPlacar(ri,ji,a,b){
+    const ga=document.getElementById(`r${ri}a${ji}`).value;
+    const gb=document.getElementById(`r${ri}b${ji}`).value;
+    resultados[`${ri}-${ji}`]={a,b,ga:ga!==""?parseInt(ga):null,gb:gb!==""?parseInt(gb):null};
+    atualizarClassificacao();
+  }
 
-    function gerarSemis(){
-      const div=document.getElementById("mata-mata");
-      div.innerHTML+="<h3>Semifinais</h3>";
-      const semi1=[window.semiDireto[0],window.quartasRes[0]];
-      const semi2=[window.semiDireto[1],window.quartasRes[1]];
-      [semi1,semi2].forEach((j,i)=>{
-        div.innerHTML+=`
-          <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
-            <div class="inputs">
-              <input type="number" min="0" id="sa${i}" onchange="resultadoSemi(${i},${j[0]},${j[1]})"> - 
-              <input type="number" min="0" id="sb${i}" onchange="resultadoSemi(${i},${j[0]},${j[1]})">
-            </div>
-          </div>`;
-      });
-      window.semiRes={};
-    }
+  function atualizarClassificacao(){
+    tabela.forEach(t=>{t.pontos=0;t.j=0;t.v=0;t.e=0;t.d=0;t.gp=0;t.gc=0;t.sg=0;});
+    Object.values(resultados).forEach(r=>{
+      if(r.ga!=null && r.gb!=null){
+        const ta=tabela[r.a], tb=tabela[r.b];
+        ta.j++; tb.j++;
+        ta.gp+=r.ga; ta.gc+=r.gb;
+        tb.gp+=r.gb; tb.gc+=r.ga;
+        if(r.ga>r.gb){ ta.v++; tb.d++; ta.pontos+=3; }
+        else if(r.gb>r.ga){ tb.v++; ta.d++; tb.pontos+=3; }
+        else { ta.e++; tb.e++; ta.pontos++; tb.pontos++; }
+      }
+    });
+    tabela.forEach(t=>t.sg=t.gp-t.gc);
+    tabela.sort((a,b)=>b.pontos-a.pontos || b.v-a.v || b.sg-a.sg || b.gp-a.gp);
+    renderClassificacao();
+  }
 
-    function resultadoSemi(i,a,b){
-      const ga=parseInt(document.getElementById("sa"+i).value)||0;
-      const gb=parseInt(document.getElementById("sb"+i).value)||0;
-      window.semiRes[i]=(ga>gb?a:gb>ga?b:null);
-      if(Object.keys(window.semiRes).length===2) gerarFinal();
-    }
+  function renderClassificacao(){
+    let html="<h2>Classificação</h2><table><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr>";
+    tabela.forEach((t,i)=>{
+      html+=`<tr><td>${i+1}</td><td>Time ${t.id+1}</td><td>${t.pontos}</td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td>${t.gp}</td><td>${t.gc}</td><td>${t.sg}</td></tr>`;
+    });
+    html+="</table>";
+    document.getElementById("classificacao").innerHTML=html;
 
-    function gerarFinal(){
-      const div=document.getElementById("mata-mata");
-      div.innerHTML+="<h3>Final</h3>";
-      const j=[window.semiRes[0],window.semiRes[1]];
+    // Quando todos os jogos forem preenchidos
+    const totalJogos = rodadas.reduce((acc, r)=>acc + r.filter(j=>j[1]!==null).length, 0);
+    const preenchidos = Object.values(resultados).filter(r=>r.ga!=null && r.gb!=null).length;
+    if (preenchidos === totalJogos) gerarMataMata();
+  }
+
+  // ================= MATA-MATA =====================
+  function gerarMataMata(){
+    const div=document.getElementById("mata-mata");
+    div.innerHTML="<h2>Mata-Mata</h2>";
+
+    const classificados=tabela.slice(0,6);
+    const semi1Direto=classificados[0].id;
+    const semi2Direto=classificados[1].id;
+    const quartas=[[classificados[2].id,classificados[5].id],[classificados[3].id,classificados[4].id]];
+    
+    div.innerHTML+="<h3>Quartas de Final</h3>";
+    quartas.forEach((j,i)=>{
       div.innerHTML+=`
         <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
           <div class="inputs">
-            <input type="number" min="0" id="fa" onchange="resultadoFinal(${j[0]},${j[1]})"> - 
-            <input type="number" min="0" id="fb" onchange="resultadoFinal(${j[0]},${j[1]})">
+            <input type="number" min="0" id="qa${i}" onchange="resultadoQuartas(${i},${j[0]},${j[1]})"> - 
+            <input type="number" min="0" id="qb${i}" onchange="resultadoQuartas(${i},${j[0]},${j[1]})">
           </div>
         </div>`;
-    }
+    });
 
-    function resultadoFinal(a,b){
-      const ga=parseInt(document.getElementById("fa").value)||0;
-      const gb=parseInt(document.getElementById("fb").value)||0;
-      if(ga>gb) alert("🏆 Campeão: Time "+(a+1));
-      else if(gb>ga) alert("🏆 Campeão: Time "+(b+1));
-      else alert("Empate! ⚽ Decida nos pênaltis manualmente.");
-    }
-  </script>
+    window.quartasRes={};
+    window.semiDireto=[semi1Direto,semi2Direto];
+  }
+
+  function resultadoQuartas(i,a,b){
+    const ga=parseInt(document.getElementById("qa"+i).value)||0;
+    const gb=parseInt(document.getElementById("qb"+i).value)||0;
+    if(ga===gb) return alert("Empate! Decida manualmente.");
+    window.quartasRes[i]=(ga>gb?a:b);
+    if(Object.keys(window.quartasRes).length===2) gerarSemis();
+  }
+
+  function gerarSemis(){
+    const div=document.getElementById("mata-mata");
+    div.innerHTML+="<h3>Semifinais</h3>";
+
+    const semi1=[window.semiDireto[0],window.quartasRes[0]];
+    const semi2=[window.semiDireto[1],window.quartasRes[1]];
+    window.semiRes={};
+
+    [semi1,semi2].forEach((j,i)=>{
+      div.innerHTML+=`
+        <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
+          <div class="inputs">
+            <input type="number" min="0" id="sa${i}" onchange="resultadoSemi(${i},${j[0]},${j[1]})"> - 
+            <input type="number" min="0" id="sb${i}" onchange="resultadoSemi(${i},${j[0]},${j[1]})">
+          </div>
+        </div>`;
+    });
+  }
+
+  function resultadoSemi(i,a,b){
+    const ga=parseInt(document.getElementById("sa"+i).value)||0;
+    const gb=parseInt(document.getElementById("sb"+i).value)||0;
+    if(ga===gb) return alert("Empate! Decida manualmente.");
+    window.semiRes[i]=(ga>gb?a:b);
+    if(Object.keys(window.semiRes).length===2) gerarFinal();
+  }
+
+  function gerarFinal(){
+    const div=document.getElementById("mata-mata");
+    div.innerHTML+="<h3>Final</h3>";
+    const j=[window.semiRes[0],window.semiRes[1]];
+    window.finalRes = null;
+    div.innerHTML+=`
+      <div class="jogo"><strong>Time ${j[0]+1} x Time ${j[1]+1}</strong>
+        <div class="inputs">
+          <input type="number" min="0" id="fa" onchange="resultadoFinal(${j[0]},${j[1]})"> - 
+          <input type="number" min="0" id="fb" onchange="resultadoFinal(${j[0]},${j[1]})">
+        </div>
+      </div>`;
+  }
+
+  function resultadoFinal(a,b){
+    const ga=parseInt(document.getElementById("fa").value)||0;
+    const gb=parseInt(document.getElementById("fb").value)||0;
+    if(ga===gb) return alert("Empate! Decida nos pênaltis!");
+    const campeao = ga>gb ? a : b;
+    alert("🏆 CAMPEÃO: Time "+(campeao+1)+" 🥇");
+  }
+</script>
+
 </body>
 </html>
+
 
